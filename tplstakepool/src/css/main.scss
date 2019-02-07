@@ -43,7 +43,7 @@ body{
 	font-family: 'Source Sans Pro', sans-serif;
 }
 .container{
-	background: #132F4B;
+	background: #f8f9fc;
 	min-height:100%;
 	position:relative;
 	padding: 0;
@@ -58,23 +58,24 @@ svg:not(:root) {
 }
 .container-fluid{
 	width: 100%;
-	padding-left: 50px;
-	padding-right: 50px;
+	padding-left: 0;
 
 }
 .pie-margin{
 	    margin-bottom: 125px;
 }
 .navbar-default{
-	background-color: #0C1E3E;
+	background-color: #fff;
 	border: none;
 	border-radius: 0;
 	margin: auto;
 	width: 100%;
 	max-width: 100%;
+	-webkit-box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
 
 	.navbar-nav li>a{
-		color: #fff;
+		color: #212121;
 		font-size: 2.0rem;
 		line-height: 63px;
 		padding: 10px 27px;
@@ -103,26 +104,26 @@ svg:not(:root) {
 
 h1{
 	margin-top: 0;
-	color: #fff;
+	color: #212121;
 	font-size: 3.4rem;
 	font-weight: 600;
 }
 h2{
         margin-top: 0;
-        color: #fff;
+        color: #212121;
         font-size: 2.8rem;
         font-weight: 300;
 }
 p{
-	color: #fff;
-	font-size: 1.73rem;
+	color: #212121;
+	font-size: 14px;
 
 }
 ul{
 	padding:0;
 }
 li{
-	color: #fff;
+	color: #212121;
 	list-style: none;
 	font-size: 1.73rem;
 }
@@ -132,11 +133,11 @@ li{
 }
 
 a{
-	color: #69d5f7;
+	color: #4e73df;
 	font-size: 1.73rem;
 
 	&:hover,&:focus,&:active{
-		color: #69d5f7;
+		color: #4e73df;
 	}
 }
 
@@ -146,17 +147,16 @@ a{
 
 
 .btn-primary{
-		background: #2972ff;
-	    background: -webkit-linear-gradient(#699bff, #2972ff);
-	    background: -o-linear-gradient(#699bff, #2972ff);
-	    background: -moz-linear-gradient(#699bff, #2972ff);
-	    background: linear-gradient(#699bff, #2972ff);
-	    padding: 16px 28px;
-	    font-size: 1.73rem;
-	    border: 0;
+	background-color: #4e73df;
+    border-color: #4e73df;
+	color: #fff;
+	&:hover {
+    	background-color: #2e59d9;
+    	border-color: #2653d4;
+    }
 
 	a{
-		color: #fff;
+		color: #212121;
 		font-size: 1.73rem;
 		text-decoration: none;
 	}
@@ -176,22 +176,30 @@ a{
 
 .form-horizontal .control-label {
     padding-top: 13px;
-    color: #fff;
+    color: #212121;
     font-size: 1.73rem;
 }
 .form-control{
 	height: 40px;
-	font-size: 1.73rem;
-	color: #2970ff;
-	border: none;
-	font-weight: bold;
-	box-shadow: none!important;
+    padding: 5px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #6e707e;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #d1d3e2;
+    border-radius: 5px;
 	-webkit-box-shadow: none!important;
 	-webkit-transition: border ease-in-out 0.15s;
 	-o-transition: border ease-in-out 0.15s;
 	transition: border ease-in-out 0.15s;
 	 &:focus{
-	border: 2px solid #2970ff;  
+		color: #6e707e;
+	    background-color: #fff;
+	    border-color: #bac8f3;
+	    outline: 0;
+	    -webkit-box-shadow: 0 0 0 0.2rem rgba(78,115,223,.25);
+	    box-shadow: 0 0 0 0.2rem rgba(78,115,223,.25); 
 	}
 }
 
@@ -235,7 +243,7 @@ a{
     text-align: left;
     float: left;
     padding: 9px 0 0 0;
-    color: #fff;
+    color: #212121;
     font-size: 1.8rem;
 	}
 	.btn-primary{
@@ -268,7 +276,7 @@ a{
 	h1{position: absolute;}
 }
 .table>thead>tr>th, .table>tbody>tr>td{
-	color: #fff;
+	color: #212121;
 }	
 
 .table>thead>tr>th{
@@ -351,12 +359,13 @@ td:last-child{
 	transform: translate(72px, 30px);
 }
  footer{
-	background-color: #0C1E3E;
+	background-color: #fff;
 	position: absolute;
 	bottom: 0;
 	width: 1705px;
 	max-width: 100%;
 	padding: 11px 13px;
+	box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,0.15) !important;
 
 	p{
 		margin: 0;
@@ -384,7 +393,7 @@ text {
 .legend-box label {
 
     font-size: 12px;
-    color: #fff;
+    color: #212121;
     text-align: right;
     width: 200px;
 }
@@ -533,7 +542,7 @@ margin-right: -10px;
 .navbar-default {
 	padding: 5px 0px;
 	.navbar-nav li > a {
-	    color: #fff;
+	    color: #212121;
 	    font-size: 2.0rem;
 	    line-height: 35px;
 	    padding: 0 13px;
@@ -615,17 +624,37 @@ margin-right: -10px;
     font-family: Droid Sans;
 }
 
+.panel-group {
+	margin-bottom: 40px;
+}
+
 .panel-control {
 	background: transparent;
+	box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+	margin-bottom: 10px;
+	border-radius: 6px !important;
+
+	.panel-title {
+		a {
+			color: #4e73df !important;
+			font-weight: 700 !important;
+			font-size: 16px;
+		}
+	}
+	.panel-body {
+		background-color: #fff;
+		border-radius: 0 0 6px 6px;
+	}
 }
 
 .panel-control .panel-heading {
 	background: transparent;
-	color: #FFFFFF;
+	color: #212121;
+	padding: 16px 20px;
 }
 th {
-	color: #FFFFFF;
+	color: #212121;
 }
 .control-label {
-	color: #FFFFFF;
+	color: #212121;
 }

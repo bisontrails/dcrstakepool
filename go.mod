@@ -2,10 +2,10 @@ module github.com/decred/dcrstakepool
 
 require (
 	github.com/btcsuite/go-flags v0.0.0-20150116065318-6c288d648c1c
+	github.com/dchest/captcha v0.0.0-20170622155422-6a29415a8364
 	github.com/decred/dcrd/blockchain/stake v1.1.0
 	github.com/decred/dcrd/certgen v1.0.2
 	github.com/decred/dcrd/chaincfg v1.3.0
-	github.com/dchest/captcha v0.0.0-20170622155422-6a29415a8364
 	github.com/decred/dcrd/chaincfg/chainhash v1.0.1
 	github.com/decred/dcrd/dcrjson v1.1.0
 	github.com/decred/dcrd/dcrutil v1.2.0
