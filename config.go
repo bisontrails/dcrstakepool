@@ -37,6 +37,10 @@ const (
 	defaultDBName          = "stakepool"
 	defaultDBPort          = "3306"
 	defaultDBUser          = "stakepool"
+	defaultDBtls          = false
+	defaultDBca           = ""
+	defaultDBcert         = ""
+	defaultDBkey          = ""
 	defaultListen          = ":8000"
 	defaultPoolEmail       = "admin@example.com"
 	defaultPoolFees        = 7.5
@@ -65,6 +69,7 @@ var runServiceCommand func(string) error
 //
 // See loadConfig for details on the configuration load process.
 type config struct {
+<<<<<<< HEAD
 	ShowVersion        bool    `short:"V" long:"version" description:"Display version information and exit"`
 	ConfigFile         string  `short:"C" long:"configfile" description:"Path to configuration file"`
 	DataDir            string  `short:"b" long:"datadir" description:"Deprecated. Unused, do not set."`
@@ -88,6 +93,10 @@ type config struct {
 	DBPassword         string  `long:"dbpassword" description:"Password for database connection"`
 	DBPort             string  `long:"dbport" description:"Port for database connection"`
 	DBName             string  `long:"dbname" description:"Name of database"`
+	DBtls              bool     `long:"dbtls" dscriptions:"DB uses TLS on or off"`
+	DBca               string   `long:"dbca" dscriptions:"DB CA location"`
+	DBcert             string   `long:"dbcert" dscriptions:"DB client certificate location"`
+	DBkey              string   `long:"dbkey" dscriptions:"DB client key location"`
 	PublicPath         string  `long:"publicpath" description:"Path to the public folder which contains css/fonts/images/javascript."`
 	TemplatePath       string  `long:"templatepath" description:"Path to the views folder which contains html files."`
 	PoolEmail          string  `long:"poolemail" description:"Email address to for support inquiries"`
@@ -324,6 +333,10 @@ func loadConfig() (*config, []string, error) {
 		DBName:          defaultDBName,
 		DBPort:          defaultDBPort,
 		DBUser:          defaultDBUser,
+		DBtls:        defaultDBtls,
+		DBca:         defaultDBca,
+		DBcert:       defaultDBcert,
+		DBkey:        defaultDBkey,
 		Listen:          defaultListen,
 		PoolEmail:       defaultPoolEmail,
 		PoolFees:        defaultPoolFees,

@@ -65,7 +65,7 @@ func runMain() error {
 
 	application.Init(cfg.APISecret, cfg.BaseURL, cfg.CookieSecret,
 		cfg.CookieSecure, cfg.DBHost, cfg.DBName, cfg.DBPassword, cfg.DBPort,
-		cfg.DBUser)
+		cfg.DBUser, cfg.DBtls, cfg.DBca, cfg.DBcert, cfg.DBkey)
 	if application.DbMap == nil {
 		return fmt.Errorf("Failed to open database.")
 	}
