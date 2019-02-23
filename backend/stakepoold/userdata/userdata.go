@@ -14,6 +14,10 @@ type DBConfig struct {
 	DBPassword string
 	DBPort     string
 	DBUser     string
+	DBtls      bool
+	DBca       string
+	DBcert     string
+	DBkey      string
 }
 
 // UserData stores the current snapshot of the user voting config.
@@ -41,7 +45,7 @@ func (u *UserData) MySQLFetchAddedLowFeeTickets() (map[chainhash.Hash]string, er
 
 	tickets := make(map[chainhash.Hash]string)
 
-	db, err := sql.Open("mysql", fmt.Sprint(u.DBConfig.DBUser, ":", u.DBConfig.DBPassword, "@(", u.DBConfig.DBHost, ":", u.DBConfig.DBPort, ")/", u.DBConfig.DBName, "?charset=utf8mb4"))
+	db, err := sql.Open("mysql", GetDBConnectionString(u.DBConfig.DBUser, u.DBConfig.DBPassword, u.DBConfig.DBHost, u.DBConfig.DBPort, u.DBConfig.DBName, u.DBConfig.DBtls))
 	if err != nil {
 		log.Errorf("Unable to open db: %v", err)
 		return tickets, err
@@ -92,7 +96,7 @@ func (u *UserData) MySQLFetchUserVotingConfig() (map[string]UserVotingConfig, er
 
 	userInfo := map[string]UserVotingConfig{}
 
-	db, err := sql.Open("mysql", fmt.Sprint(u.DBConfig.DBUser, ":", u.DBConfig.DBPassword, "@(", u.DBConfig.DBHost, ":", u.DBConfig.DBPort, ")/", u.DBConfig.DBName, "?charset=utf8mb4"))
+	db, err := sql.Open("mysql", GetDBConnectionString(u.DBConfig.DBUser, u.DBConfig.DBPassword, u.DBConfig.DBHost, u.DBConfig.DBPort, u.DBConfig.DBName, u.DBConfig.DBtls))
 	if err != nil {
 		log.Errorf("Unable to open db: %v", err)
 		return userInfo, err
@@ -131,15 +135,26 @@ func (u *UserData) MySQLFetchUserVotingConfig() (map[string]UserVotingConfig, er
 }
 
 // DBSetConfig sets the database configuration.
-func (u *UserData) DBSetConfig(DBUser string, DBPassword string, DBHost string, DBPort string, DBName string) {
+func (u *UserData) DBSetConfig(DBUser string, DBPassword string, DBHost string, DBPort string, DBName string, DBtls bool, DBca string, DBcert string, DBkey string) {
 	dbconfig := &DBConfig{
 		DBHost:     DBHost,
 		DBName:     DBName,
 		DBPassword: DBPassword,
 		DBPort:     DBPort,
 		DBUser:     DBUser,
+		DBtls:      DBtls,
+		DBca:       DBca,
+		DBcert:     DBcert,
+		DBkey:      DBkey,
 	}
 	u.Lock()
 	u.DBConfig = dbconfig
 	u.Unlock()
+}
+
+func GetDBConnectionString(user string, password string, hostname string, port string, database string, isTLS bool) string {
+	if isTLS {
+		return fmt.Sprint(user, ":", password, "@(", hostname, ":", port, ")/", database, "?charset=utf8mb4&tls=stakepoold")
+	}
+	return fmt.Sprint(user, ":", password, "@(", hostname, ":", port, ")/", database, "?charset=utf8mb4")
 }

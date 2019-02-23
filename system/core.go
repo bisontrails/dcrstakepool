@@ -2,10 +2,13 @@ package system
 
 import (
 	"crypto/sha256"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,6 +20,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/zenazn/goji/web"
 
+	"github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc/codes"
 )
 
@@ -53,8 +57,8 @@ func GojiWebHandlerFunc(h http.HandlerFunc) web.HandlerFunc {
 
 func (application *Application) Init(APISecret string, baseURL string,
 	cookieSecret string, cookieSecure bool, DBHost string, DBName string,
-	DBPassword string,
-	DBPort string, DBUser string) {
+	DBPassword string,DBPort string, DBUser string, DBtls bool, DBca string,
+	DBcert string, DBkey string) {
 
 	hash := sha256.New()
 	io.WriteString(hash, cookieSecret)
@@ -65,6 +69,8 @@ func (application *Application) Init(APISecret string, baseURL string,
 		Secure:   cookieSecure,
 	}
 
+	DBSetupTLS(DBtls, DBca, DBcert, DBkey)
+
 	application.DbMap = models.GetDbMap(
 		APISecret,
 		baseURL,
@@ -72,7 +78,8 @@ func (application *Application) Init(APISecret string, baseURL string,
 		DBPassword,
 		DBHost,
 		DBPort,
-		DBName)
+		DBName,
+		DBtls)
 
 	application.CsrfProtection = &CsrfProtection{
 		Key:    CSRFKey,
@@ -213,4 +220,35 @@ type APIResponse struct {
 // NewAPIResponse is a constructor for APIResponse.
 func NewAPIResponse(status string, code codes.Code, message string, data interface{}) *APIResponse {
 	return &APIResponse{status, code, message, data}
+}
+
+func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
+	if !isTLS {
+		return
+	}
+	log.Infof("setting up tls")
+	rootCertPool := x509.NewCertPool()
+	pem, err := ioutil.ReadFile(ca) //"/path/ca-cert.pem"
+	if err != nil {
+		log.Errorf("Failed reading CA cert for MySQL: %v", err)
+	} else {
+		log.Infof("Read CA cert for MySQL")
+	}
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		log.Errorf("Failed to append PEM MySQL: %v", err)
+	} else {
+		log.Infof("Appended PEM for MySQL")
+	}
+	clientCert := make([]tls.Certificate, 0, 1)
+	certs, err := tls.LoadX509KeyPair(cert, key)//("/path/client-cert.pem", "/path/client-key.pem")
+	if err != nil {
+		log.Errorf("Failed to load MySQL client cert and key: %v", err)
+	} else {
+		log.Infof("Loaded MySQL client cert and key for tls %v %v", key, cert)
+	}
+	clientCert = append(clientCert, certs)
+	mysql.RegisterTLSConfig("stakepoold", &tls.Config{
+		RootCAs: rootCertPool,
+		Certificates: clientCert,
+	})
 }
