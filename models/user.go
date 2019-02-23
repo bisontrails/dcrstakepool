@@ -293,11 +293,10 @@ func GetVotableLowFeeTickets(dbMap *gorp.DbMap) ([]LowFeeTicket, error) {
 	return votableLowFeeTickets, nil
 }
 
-func GetDbMap(APISecret, baseURL, user, password, hostname, port, database string) *gorp.DbMap {
-	// Connect to db using standard Go database/sql API.
-	dataSource := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4",
-		user, password, hostname, port, database)
-	db, err := sql.Open("mysql", dataSource)
+func GetDbMap(APISecret, baseURL, user, password, hostname, port, database string, isTLS bool) *gorp.DbMap {
+
+	db, err := sql.Open("mysql", GetDBConnectionString(user, password, hostname, port, database, isTLS))
+
 	if err != nil {
 		log.Critical("sql.Open failed: ", err)
 		return nil
@@ -406,6 +405,15 @@ func GetDbMap(APISecret, baseURL, user, password, hostname, port, database strin
 	AddColumn(dbMap, database, usersTableName, "VoteBitsVersion", "bigint(20) NULL", "VoteBits", "UPDATE Users SET VoteBitsVersion = 3")
 
 	return dbMap
+}
+
+func GetDBConnectionString(user, password, hostname, port, database string, isTLS bool) string {
+	if isTLS {
+		return fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4&tls=stakepoold",
+			user, password, hostname, port, database)
+	}
+	return fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4",
+		user, password, hostname, port, database)
 }
 
 // AddColumn checks if a column exists and adds it if it doesn't
