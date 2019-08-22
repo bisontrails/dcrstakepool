@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/decred/dcrd/rpcclient/v2"
 	"io/ioutil"
 	"time"
 
@@ -34,6 +35,7 @@ func connectNodeRPC(ctx *rpcserver.AppContext, cfg *config) (*rpcclient.Client, 
 		User:         cfg.DcrdUser,
 		Pass:         cfg.DcrdPassword,
 		Certificates: dcrdCert,
+		DisableAutoReconnect: false,
 	}
 
 	ntfnHandlers := getNodeNtfnHandlers(ctx)
@@ -82,7 +84,7 @@ func connectWalletRPC(cfg *config) (*rpcserver.Client, semver, error) {
 		User:                 cfg.WalletUser,
 		Pass:                 cfg.WalletPassword,
 		Certificates:         dcrwCert,
-		DisableAutoReconnect: true,
+		DisableAutoReconnect: false,
 	}
 
 	ntfnHandlers := getWalletNtfnHandlers()
