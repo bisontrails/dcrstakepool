@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/decred/dcrd/rpcclient/v2"
 	"io/ioutil"
 	"time"
 
