@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -237,3 +238,25 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 		Certificates: clientCert,
 	})
 }
+
+// ClientIP gets the client's real IP address using the X-Real-IP header, or
+// if that is empty, http.Request.RemoteAddr. See the sample nginx.conf for
+// using the real_ip module to correctly set the X-Real-IP header.
+func ClientIP(r *http.Request, realIPHeader string) string {
+	// getHost returns the host portion of a string containing either a
+	// host:port formatted name or just a host.
+	getHost := func(hostPort string) string {
+		ip, _, err := net.SplitHostPort(hostPort)
+		if err != nil {
+			return hostPort
+		}
+		return ip
+	}
+
+	// If header not set, return RemoteAddr. Invalid hosts are replaced with "".
+	if realIPHeader == "" {
+		return getHost(r.RemoteAddr)
+	}
+	return getHost(r.Header.Get(realIPHeader))
+}
+
