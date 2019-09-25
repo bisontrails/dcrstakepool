@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
+	"sync"
 	"time"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
@@ -63,7 +65,7 @@ func connectNodeRPC(ctx *rpcserver.AppContext, cfg *config) (*rpcclient.Client, 
 	return dcrdClient, nodeVer, nil
 }
 
-func connectWalletRPC(cfg *config) (*rpcserver.Client, semver, error) {
+func connectWalletRPC(ctx context.Context, wg *sync.WaitGroup, cfg *config) (*rpcserver.Client, semver, error) {
 	var walletVer semver
 
 	dcrwCert, err := ioutil.ReadFile(cfg.WalletCert)
@@ -89,7 +91,7 @@ func connectWalletRPC(cfg *config) (*rpcserver.Client, semver, error) {
 	ntfnHandlers := getWalletNtfnHandlers()
 
 	// New also starts an autoreconnect function.
-	dcrwClient, err := rpcserver.NewClient(connCfgWallet, ntfnHandlers)
+	dcrwClient, err := rpcserver.NewClient(ctx, wg, connCfgWallet, ntfnHandlers)
 	if err != nil {
 		log.Errorf("Verify that username and password is correct and that "+
 			"rpc.cert is for your wallet: %v", cfg.WalletCert)
