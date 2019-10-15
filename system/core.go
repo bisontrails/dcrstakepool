@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
@@ -15,6 +16,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/decred/dcrstakepool/models"
 	"github.com/go-gorp/gorp"
@@ -41,8 +43,9 @@ func GojiWebHandlerFunc(h http.HandlerFunc) web.HandlerFunc {
 	}
 }
 
-func (application *Application) Init(APISecret, baseURL, cookieSecret string,
-	cookieSecure bool, DBHost, DBName, DBPassword, DBPort, DBUser string, DBtls bool, DBca string,
+func (application *Application) Init(ctx context.Context, wg *sync.WaitGroup,
+	APISecret, baseURL, cookieSecret string, cookieSecure bool, DBHost, 
+	DBName, DBPassword, DBPort, DBUser string, DBtls bool, DBca string,
 	DBcert string, DBkey string) {
 
 	DBSetupTLS(DBtls, DBca, DBcert, DBkey)
@@ -59,7 +62,7 @@ func (application *Application) Init(APISecret, baseURL, cookieSecret string,
 
 	hash := sha256.New()
 	io.WriteString(hash, cookieSecret)
-	application.Store = NewSQLStore(application.DbMap, hash.Sum(nil))
+	application.Store = NewSQLStore(ctx, wg, application.DbMap, hash.Sum(nil))
 	application.Store.Options = &sessions.Options{
 		Path:     "/",
 		HttpOnly: true,
