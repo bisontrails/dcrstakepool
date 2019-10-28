@@ -29,7 +29,6 @@ import (
 	"github.com/decred/dcrstakepool/helpers"
 	"github.com/decred/dcrstakepool/signal"
 	"github.com/decred/dcrwallet/wallet/v3/txrules"
-	"github.com/decred/dcrwallet/wallet/v3/udb"
 
 	// register database driver
 	_ "github.com/go-sql-driver/mysql"
@@ -81,7 +80,7 @@ func calculateFeeAddresses(xpubStr string, params *chaincfg.Params) (map[string]
 	}
 
 	// Derive from external branch
-	branchKey, err := key.Child(udb.ExternalBranch)
+	branchKey, err := key.Child(helpers.ExternalBranch)
 	if err != nil {
 		return nil, err
 	}
