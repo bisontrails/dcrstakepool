@@ -44,7 +44,7 @@ func GojiWebHandlerFunc(h http.HandlerFunc) web.HandlerFunc {
 }
 
 func (application *Application) Init(ctx context.Context, wg *sync.WaitGroup,
-	APISecret, baseURL, cookieSecret string, cookieSecure bool, DBHost, 
+	APISecret, baseURL, cookieSecret string, cookieSecure bool, DBHost,
 	DBName, DBPassword, DBPort, DBUser string, DBtls bool, DBca string,
 	DBcert string, DBkey string) {
 
@@ -222,7 +222,7 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 		log.Infof("Appended PEM for MySQL")
 	}
 	clientCert := make([]tls.Certificate, 0, 1)
-	certs, err := tls.LoadX509KeyPair(cert, key)//("/path/client-cert.pem", "/path/client-key.pem")
+	certs, err := tls.LoadX509KeyPair(cert, key) //("/path/client-cert.pem", "/path/client-key.pem")
 	if err != nil {
 		log.Errorf("Failed to load MySQL client cert and key: %v", err)
 	} else {
@@ -230,7 +230,7 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 	}
 	clientCert = append(clientCert, certs)
 	mysql.RegisterTLSConfig("stakepoold", &tls.Config{
-		RootCAs: rootCertPool,
+		RootCAs:      rootCertPool,
 		Certificates: clientCert,
 	})
 }
@@ -255,4 +255,3 @@ func ClientIP(r *http.Request, realIPHeader string) string {
 	}
 	return getHost(r.Header.Get(realIPHeader))
 }
-
