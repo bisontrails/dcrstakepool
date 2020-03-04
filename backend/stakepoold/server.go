@@ -5,9 +5,9 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"context"
 	"encoding/gob"
 	"errors"
 	"fmt"
@@ -192,7 +192,7 @@ func runMain(ctx context.Context) error {
 	var userData = &userdata.UserData{}
 	userData.DBSetConfig(cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBtls, cfg.DBca, cfg.DBcert, cfg.DBkey)
 
-	DBSetupTLS(userData.DBConfig.DBtls, userData.DBConfig.DBca, userData.DBConfig.DBcert, userData.DBConfig.DBkey);
+	DBSetupTLS(userData.DBConfig.DBtls, userData.DBConfig.DBca, userData.DBConfig.DBcert, userData.DBConfig.DBkey)
 
 	addedLowFeeTicketsMSA, errMySQLFetchAddedLowFeeTickets := userData.MySQLFetchAddedLowFeeTickets()
 	if errMySQLFetchAddedLowFeeTickets != nil {
@@ -605,7 +605,7 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 		log.Infof("Appended PEM for MySQL")
 	}
 	clientCert := make([]tls.Certificate, 0, 1)
-	certs, err := tls.LoadX509KeyPair(cert, key)//("/path/client-cert.pem", "/path/client-key.pem")
+	certs, err := tls.LoadX509KeyPair(cert, key) //("/path/client-cert.pem", "/path/client-key.pem")
 	if err != nil {
 		log.Errorf("Failed to load MySQL client cert and key: %v", err)
 	} else {
@@ -613,7 +613,7 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 	}
 	clientCert = append(clientCert, certs)
 	mysql.RegisterTLSConfig("stakepoold", &tls.Config{
-		RootCAs: rootCertPool,
+		RootCAs:      rootCertPool,
 		Certificates: clientCert,
 	})
 }

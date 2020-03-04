@@ -31,11 +31,11 @@ func connectNodeRPC(spd *stakepool.Stakepoold, cfg *config) (*rpcclient.Client, 
 		cfg.DcrdHost, cfg.DcrdUser, cfg.DcrdCert)
 
 	connCfgDaemon := &rpcclient.ConnConfig{
-		Host:         cfg.DcrdHost,
-		Endpoint:     "ws", // websocket
-		User:         cfg.DcrdUser,
-		Pass:         cfg.DcrdPassword,
-		Certificates: dcrdCert,
+		Host:                 cfg.DcrdHost,
+		Endpoint:             "ws", // websocket
+		User:                 cfg.DcrdUser,
+		Pass:                 cfg.DcrdPassword,
+		Certificates:         dcrdCert,
 		DisableAutoReconnect: false,
 	}
 

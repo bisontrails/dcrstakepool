@@ -35,10 +35,10 @@ var (
 	defaultHomeDir     = dcrutil.AppDataDir("stakepoold", false)
 	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
 	defaultDataDir     = filepath.Join(defaultHomeDir, defaultDataDirname)
-	defaultDBtls	   = false
+	defaultDBtls       = false
 	defaultDBca        = filepath.Join(defaultHomeDir, defaultCaFilename)
-	defaultDBcert	   = filepath.Join(defaultHomeDir, defaultCertFilename)
-	defaultDBkey	   = filepath.Join(defaultHomeDir, defaultKeyFilename)
+	defaultDBcert      = filepath.Join(defaultHomeDir, defaultCertFilename)
+	defaultDBkey       = filepath.Join(defaultHomeDir, defaultKeyFilename)
 	defaultRPCKeyFile  = filepath.Join(defaultHomeDir, "rpc.key")
 	defaultRPCCertFile = filepath.Join(defaultHomeDir, "rpc.cert")
 	defaultLogDir      = filepath.Join(defaultHomeDir, defaultLogDirname)
@@ -74,10 +74,10 @@ type config struct {
 	DBPassword       string   `long:"dbpassword" description:"Password for database connection"`
 	DBPort           string   `long:"dbport" description:"Port for database connection"`
 	DBName           string   `long:"dbname" description:"Name of database"`
-	DBtls            bool    `long:"dbtls" dscriptions:"DB uses TLS on or off"`
-	DBca             string  `long:"dbca" dscriptions:"DB CA location"`
-	DBcert           string  `long:"dbcert" dscriptions:"DB client certificate location"`
-	DBkey            string  `long:"dbkey" dscriptions:"DB client key location"`
+	DBtls            bool     `long:"dbtls" dscriptions:"DB uses TLS on or off"`
+	DBca             string   `long:"dbca" dscriptions:"DB CA location"`
+	DBcert           string   `long:"dbcert" dscriptions:"DB client certificate location"`
+	DBkey            string   `long:"dbkey" dscriptions:"DB client key location"`
 	DcrdHost         string   `long:"dcrdhost" description:"Hostname/IP for dcrd server"`
 	DcrdUser         string   `long:"dcrduser" description:"Username for dcrd server"`
 	DcrdPassword     string   `long:"dcrdpassword" description:"Password for dcrd server"`
