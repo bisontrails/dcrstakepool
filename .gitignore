@@ -1,6 +1,5 @@
 config.toml
 dcrstakepool
-vendor/
 .vscode/
 .idea/
 controllers/config.go*
@@ -8,3 +7,4 @@ testing/
 *.orig
 debug
 .idea/
+public/**/*.gz

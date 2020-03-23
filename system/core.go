@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
@@ -9,11 +10,13 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/decred/dcrstakepool/models"
 	"github.com/go-gorp/gorp"
@@ -40,8 +43,9 @@ func GojiWebHandlerFunc(h http.HandlerFunc) web.HandlerFunc {
 	}
 }
 
-func (application *Application) Init(APISecret, baseURL, cookieSecret string,
-	cookieSecure bool, DBHost, DBName, DBPassword, DBPort, DBUser string, DBtls bool, DBca string,
+func (application *Application) Init(ctx context.Context, wg *sync.WaitGroup,
+	APISecret, baseURL, cookieSecret string, cookieSecure bool, DBHost,
+	DBName, DBPassword, DBPort, DBUser string, DBtls bool, DBca string,
 	DBcert string, DBkey string) {
 
 	DBSetupTLS(DBtls, DBca, DBcert, DBkey)
@@ -58,7 +62,7 @@ func (application *Application) Init(APISecret, baseURL, cookieSecret string,
 
 	hash := sha256.New()
 	io.WriteString(hash, cookieSecret)
-	application.Store = NewSQLStore(application.DbMap, hash.Sum(nil))
+	application.Store = NewSQLStore(ctx, wg, application.DbMap, hash.Sum(nil))
 	application.Store.Options = &sessions.Options{
 		Path:     "/",
 		HttpOnly: true,
@@ -68,6 +72,12 @@ func (application *Application) Init(APISecret, baseURL, cookieSecret string,
 	}
 
 	application.APISecret = APISecret
+}
+
+var funcMap = template.FuncMap{
+	"times": func(a, b float64) float64 {
+		return a * b
+	},
 }
 
 func (application *Application) LoadTemplates(templatePath string) error {
@@ -90,17 +100,9 @@ func (application *Application) LoadTemplates(templatePath string) error {
 		return err
 	}
 
-	// Since template.Must panics with non-nil error, it is much more
-	// informative to pass the error to the caller (runMain) to log it and exit
-	// gracefully.
-	httpTemplates, err := template.ParseFiles(templates...)
-	if err != nil {
-		return err
-	}
-
-	application.Template = template.Must(httpTemplates, nil)
 	application.TemplatesPath = templatePath
-	return nil
+	application.Template, err = template.New("vsp").Funcs(funcMap).ParseFiles(templates...)
+	return err
 }
 
 func (application *Application) Close() {
@@ -220,7 +222,7 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 		log.Infof("Appended PEM for MySQL")
 	}
 	clientCert := make([]tls.Certificate, 0, 1)
-	certs, err := tls.LoadX509KeyPair(cert, key)//("/path/client-cert.pem", "/path/client-key.pem")
+	certs, err := tls.LoadX509KeyPair(cert, key) //("/path/client-cert.pem", "/path/client-key.pem")
 	if err != nil {
 		log.Errorf("Failed to load MySQL client cert and key: %v", err)
 	} else {
@@ -228,7 +230,28 @@ func DBSetupTLS(isTLS bool, ca string, cert string, key string) {
 	}
 	clientCert = append(clientCert, certs)
 	mysql.RegisterTLSConfig("stakepoold", &tls.Config{
-		RootCAs: rootCertPool,
+		RootCAs:      rootCertPool,
 		Certificates: clientCert,
 	})
+}
+
+// ClientIP gets the client's real IP address using the X-Real-IP header, or
+// if that is empty, http.Request.RemoteAddr. See the sample nginx.conf for
+// using the real_ip module to correctly set the X-Real-IP header.
+func ClientIP(r *http.Request, realIPHeader string) string {
+	// getHost returns the host portion of a string containing either a
+	// host:port formatted name or just a host.
+	getHost := func(hostPort string) string {
+		ip, _, err := net.SplitHostPort(hostPort)
+		if err != nil {
+			return hostPort
+		}
+		return ip
+	}
+
+	// If header not set, return RemoteAddr. Invalid hosts are replaced with "".
+	if realIPHeader == "" {
+		return getHost(r.RemoteAddr)
+	}
+	return getHost(r.Header.Get(realIPHeader))
 }

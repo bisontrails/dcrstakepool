@@ -12,10 +12,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 
-	"github.com/decred/dcrd/dcrutil"
+	"github.com/decred/dcrd/dcrutil/v2"
 	"github.com/decred/dcrstakepool/internal/version"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -36,10 +35,10 @@ var (
 	defaultHomeDir     = dcrutil.AppDataDir("stakepoold", false)
 	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
 	defaultDataDir     = filepath.Join(defaultHomeDir, defaultDataDirname)
-	defaultDBtls	   = false
+	defaultDBtls       = false
 	defaultDBca        = filepath.Join(defaultHomeDir, defaultCaFilename)
-	defaultDBcert	   = filepath.Join(defaultHomeDir, defaultCertFilename)
-	defaultDBkey	   = filepath.Join(defaultHomeDir, defaultKeyFilename)
+	defaultDBcert      = filepath.Join(defaultHomeDir, defaultCertFilename)
+	defaultDBkey       = filepath.Join(defaultHomeDir, defaultKeyFilename)
 	defaultRPCKeyFile  = filepath.Join(defaultHomeDir, "rpc.key")
 	defaultRPCCertFile = filepath.Join(defaultHomeDir, "rpc.cert")
 	defaultLogDir      = filepath.Join(defaultHomeDir, defaultLogDirname)
@@ -64,9 +63,9 @@ type config struct {
 	LogDir           string   `long:"logdir" description:"Directory to log output."`
 	TestNet          bool     `long:"testnet" description:"Use the test network"`
 	SimNet           bool     `long:"simnet" description:"Use the simulation test network"`
-	Profile          string   `long:"profile" description:"Enable HTTP profiling on given port -- NOTE port must be between 1024 and 65536"`
-	CPUProfile       string   `long:"cpuprofile" description:"Write CPU profile to the specified file"`
-	MemProfile       string   `long:"memprofile" description:"Write mem profile to the specified file"`
+	Profile          string   `long:"profile" description:"Deprecated: This config has no effect"`
+	CPUProfile       string   `long:"cpuprofile" description:"Deprecated: This config has no effect"`
+	MemProfile       string   `long:"memprofile" description:"Deprecated: This config has no effect"`
 	DebugLevel       string   `short:"d" long:"debuglevel" description:"Logging level for all subsystems {trace, debug, info, warn, error, critical} -- You may also specify <subsystem>=<level>,<subsystem2>=<level>,... to set the log level for individual subsystems -- Use show to list available subsystems"`
 	ColdWalletExtPub string   `long:"coldwalletextpub" description:"The extended public key for addresses to which voting service user fees are sent."`
 	PoolFees         float64  `long:"poolfees" description:"The per-ticket fees the user must send to the voting service with their tickets"`
@@ -75,10 +74,10 @@ type config struct {
 	DBPassword       string   `long:"dbpassword" description:"Password for database connection"`
 	DBPort           string   `long:"dbport" description:"Port for database connection"`
 	DBName           string   `long:"dbname" description:"Name of database"`
-	DBtls            bool    `long:"dbtls" dscriptions:"DB uses TLS on or off"`
-	DBca             string  `long:"dbca" dscriptions:"DB CA location"`
-	DBcert           string  `long:"dbcert" dscriptions:"DB client certificate location"`
-	DBkey            string  `long:"dbkey" dscriptions:"DB client key location"`
+	DBtls            bool     `long:"dbtls" dscriptions:"DB uses TLS on or off"`
+	DBca             string   `long:"dbca" dscriptions:"DB CA location"`
+	DBcert           string   `long:"dbcert" dscriptions:"DB client certificate location"`
+	DBkey            string   `long:"dbkey" dscriptions:"DB client key location"`
 	DcrdHost         string   `long:"dcrdhost" description:"Hostname/IP for dcrd server"`
 	DcrdUser         string   `long:"dcrduser" description:"Username for dcrd server"`
 	DcrdPassword     string   `long:"dcrdpassword" description:"Password for dcrd server"`
@@ -482,18 +481,6 @@ func loadConfig() (*config, []string, error) {
 		return nil, nil, err
 	}
 
-	// Validate profile port number
-	if cfg.Profile != "" {
-		profilePort, err := strconv.Atoi(cfg.Profile)
-		if err != nil || profilePort < 1024 || profilePort > 65535 {
-			str := "%s: The profile port must be between 1024 and 65535"
-			err := fmt.Errorf(str, funcName)
-			fmt.Fprintln(os.Stderr, err)
-			fmt.Fprintln(os.Stderr, usageMessage)
-			return nil, nil, err
-		}
-	}
-
 	if len(cfg.ColdWalletExtPub) == 0 {
 		str := "%s: coldwalletextpub is not set in config"
 		err := fmt.Errorf(str, funcName)
@@ -603,6 +590,22 @@ func loadConfig() (*config, []string, error) {
 		}
 	} else {
 		cfg.RPCListeners = normalizeAddresses(cfg.RPCListeners, activeNetParams.RPCServerPort)
+	}
+
+	// Warn about deprecated config items if they have been set
+	if cfg.Profile != "" {
+		str := "%s: Config Profile is deprecated and has no effect. Please remove from your config file"
+		log.Warnf(str, funcName)
+	}
+
+	if cfg.CPUProfile != "" {
+		str := "%s: Config CPUProfile is deprecated and has no effect. Please remove from your config file"
+		log.Warnf(str, funcName)
+	}
+
+	if cfg.MemProfile != "" {
+		str := "%s: Config MemProfile is deprecated and has no effect. Please remove from your config file"
+		log.Warnf(str, funcName)
 	}
 
 	// Warn about missing config file only after all other configuration is
